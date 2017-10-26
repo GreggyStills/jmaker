@@ -1,0 +1,12 @@
+
+Hello, {{ first_name }}!
+
+I have your information as follows:
+
+Full Name: {{ first_name }} {{ last_name }}
+Street address: {{ street_address }}
+City: {{ city }}
+State: {{ state }}   Zip: {{ zipcode }}
+Email: {{ email }}
+
+
