@@ -1,0 +1,97 @@
+#!/usr/bin/env python2
+"""
+A script to render text from Jinja2 templates + input data.
+"""
+import argparse
+import os
+import sys
+
+import jinja2
+import yaml
+
+__author__ = "Greg Stilwell"
+
+# User's home directory
+HOME = os.path.expanduser('~')
+# Where to look for Jinja2 template files (default)
+TEMPLATE_DIR = os.path.join(HOME, 'templates')
+
+
+class Jrenderer:
+    """A renderer for Jinja2 templates."""
+
+    def __init__(self, template_dir=None):
+        """Configure Jinja2 environment.
+
+        Args:
+            template_dir (str): path to Jinja2 templates
+        """
+        if template_dir:
+            tdirs = [template_dir]
+        else:
+            tdirs = [TEMPLATE_DIR]
+        for directory in tdirs:
+            assert os.path.isdir(directory), "Directory not found: {}".format(directory)
+
+        self.env = jinja2.Environment()
+        # load templates into environment
+        self.env.loader = jinja2.FileSystemLoader(tdirs)
+        # trim_blocks: If True, the first newline after a block is removed
+        self.env.trim_blocks = True
+        # lstrip_blocks: If True, leading spaces and tabs are stripped from the start of a line to a block
+        self.env.lstrip_blocks = True
+
+    def list_templates(self):
+        print "Template directory:\n\t{}".format(self.env.loader.searchpath)
+        print "Templates found:\n\t{}\n\n".format("\n\t".join(self.env.list_templates()))
+
+    def render(self, template_name, variable_data):
+        """Render template, using variable data to fill it in.
+
+        Args:
+            template_name (str): filename of Jinja2 template file to render
+            variable_data (dict): data to pass to Jinja2 for filling in template variables
+        """
+        template = self.env.get_template(template_name)
+        rendered = template.render(variable_data)
+        return rendered
+
+
+def load_yaml(yaml_file):
+    """Load data from a YAML file. (Note: also supports JSON)"""
+    assert os.path.isfile(yaml_file), "File not found: {}".format(yaml_file)
+    with open(args['datafile']) as f:
+        yaml_data = yaml.load(f)
+    return yaml_data
+
+
+def parse_args(cli_args):
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description='Jinja2 template renderer.')
+    parser.add_argument(
+        'template', nargs="?", type=str,
+        help='Name of Jinja2 template filename in template directory.')
+    parser.add_argument(
+        'datafile', nargs="?", type=str,
+        help='Name of data file (YAML/JSON) to load for filling in variables in template.')
+    parser.add_argument(
+        '--altdir', dest='altdir', type=str,
+        help='Alternate directory to search for Jinja2 templates. (default: {})'.format(TEMPLATE_DIR))
+    parser.add_argument(
+        '--lt', dest='listtemplates', action="store_true",
+        help='List templates found in template dir.')
+    parsed_args = parser.parse_args(cli_args)
+    return parsed_args
+
+
+if __name__ == "__main__":
+    args = vars(parse_args(sys.argv[1:]))
+    if args['altdir']:
+        TEMPLATE_DIR = args['altdir']
+    renderer = Jrenderer(template_dir=TEMPLATE_DIR)
+    if args['listtemplates']:
+        renderer.list_templates()
+
+    template_filename = args['template']
+    fill_data = load_yaml(args['datafile'])
+    print renderer.render(template_filename, fill_data)
