@@ -59,7 +59,7 @@ class Jrenderer:
 
 def load_yaml(yaml_file):
     """Load data from a YAML file. (Note: also supports JSON)"""
-    assert os.path.isfile(yaml_file), "File not found: {}".format(yaml_file)
+    assert os.path.isfile(str(yaml_file)), "YAML file not found: {}".format(yaml_file)
     with open(args['datafile']) as f:
         yaml_data = yaml.load(f)
     return yaml_data
@@ -85,6 +85,9 @@ def parse_args(cli_args):
 
 
 if __name__ == "__main__":
+    # print full help message if we got no args
+    if len(sys.argv) == 1:
+        parse_args(['-h'])
     args = vars(parse_args(sys.argv[1:]))
     if args['altdir']:
         TEMPLATE_DIR = args['altdir']
