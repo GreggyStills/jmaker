@@ -17,22 +17,24 @@ HOME = os.path.expanduser('~')
 TEMPLATE_DIR = os.path.join(HOME, 'templates')
 
 
+def eprint(msg, newline="\n"):
+    """Print to stderr, so redirects (>) only capture program output,
+    and not informational user messages.  Also Python3 friendly."""
+    sys.stderr.write("{}{}".format(msg, newline))
+
+
 class Jrenderer:
     """A renderer for Jinja2 templates."""
 
-    def __init__(self, template_dir=None):
+    def __init__(self, template_dir="."):
         """Configure Jinja2 environment.
 
         Args:
             template_dir (str): path to Jinja2 templates
         """
-        if template_dir:
-            tdirs = [template_dir]
-        else:
-            tdirs = [TEMPLATE_DIR]
+        tdirs = [template_dir]
         for directory in tdirs:
-            assert os.path.isdir(directory), "Directory not found: {}".format(directory)
-
+            assert os.path.isdir(directory), "Template directory not found: {}".format(directory)
         self.env = jinja2.Environment()
         # load templates into environment
         self.env.loader = jinja2.FileSystemLoader(tdirs)
@@ -42,8 +44,8 @@ class Jrenderer:
         self.env.lstrip_blocks = True
 
     def list_templates(self):
-        print "Template directory:\n\t{}".format(self.env.loader.searchpath)
-        print "Templates found:\n\t{}\n\n".format("\n\t".join(self.env.list_templates()))
+        eprint("Template directory:\n\t{}".format(self.env.loader.searchpath))
+        eprint("Templates found:\n\t{}\n\n".format("\n\t".join(self.env.list_templates())))
 
     def render(self, template_name, variable_data):
         """Render template, using variable data to fill it in.
@@ -60,13 +62,16 @@ class Jrenderer:
 def load_yaml(yaml_file):
     """Load data from a YAML file. (Note: also supports JSON)"""
     assert os.path.isfile(str(yaml_file)), "YAML file not found: {}".format(yaml_file)
-    with open(args['datafile']) as f:
+    with open(yaml_file) as f:
         yaml_data = yaml.load(f)
     return yaml_data
 
 
 def parse_args(cli_args):
     """Parse command line arguments."""
+    # print help message if no args
+    if not cli_args:
+        cli_args = ['-h']
     parser = argparse.ArgumentParser(description='Jinja2 template renderer.')
     parser.add_argument(
         'template', nargs="?", type=str,
@@ -85,17 +90,14 @@ def parse_args(cli_args):
 
 
 if __name__ == "__main__":
-    # print full help message if we got no args
-    if len(sys.argv) == 1:
-        parse_args(['-h'])
-    args = vars(parse_args(sys.argv[1:]))
-    if args['altdir']:
-        TEMPLATE_DIR = args['altdir']
+    args = parse_args(sys.argv[1:])
+    if args.altdir:
+        TEMPLATE_DIR = args.altdir
     renderer = Jrenderer(template_dir=TEMPLATE_DIR)
-    if args['listtemplates']:
+    if args.listtemplates:
         renderer.list_templates()
         exit()
 
-    template_filename = args['template']
-    fill_data = load_yaml(args['datafile'])
-    print renderer.render(template_filename, fill_data)
+    template_filename = args.template
+    fill_data = load_yaml(args.datafile)
+    print(renderer.render(template_filename, fill_data))
