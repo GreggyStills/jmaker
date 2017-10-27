@@ -5,3 +5,13 @@ city: "Beverly Hills"
 state: CA
 zip: 90210
 email: "somedude@example.com"
+pets:
+- name: Doggie
+  type: cat
+- name: Kitty
+  type: dog
+grocery_list:
+- eggs
+- milk
+- flour
+- sugar

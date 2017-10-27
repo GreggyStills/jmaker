@@ -6,7 +6,18 @@ I have your information as follows:
 Full Name: {{ first_name }} {{ last_name }}
 Street address: {{ street_address }}
 City: {{ city }}
-State: {{ state }}   Zip: {{ zipcode }}
+State: {{ state }}   Zip: {{ zip }}
 Email: {{ email }}
 
+Here's all your pets:
+{{ pets }}
 
+Well that looked yucky, didn't it?  Let's list out your pets nicely:
+{% for pet in pets %}
+{{ loop.index }}. {{ pet.name }} is a {{ pet.type }}
+{% endfor %}
+
+Oh yeah, and don't forget to pickup groceries:
+{% for item in grocery_list %}
+{{ loop.index }}. {{ item }}
+{%  endfor %}

@@ -91,6 +91,7 @@ if __name__ == "__main__":
     renderer = Jrenderer(template_dir=TEMPLATE_DIR)
     if args['listtemplates']:
         renderer.list_templates()
+        exit()
 
     template_filename = args['template']
     fill_data = load_yaml(args['datafile'])
