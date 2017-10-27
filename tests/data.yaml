@@ -1,10 +1,11 @@
 first_name: Somedude
 last_name: Lastname
-street_address: "21 Jump Street"
-city: "Beverly Hills"
-state: CA
-zip: 90210
 email: "somedude@example.com"
+address:
+  street: "21 Jump Street"
+  city: "Beverly Hills"
+  state: CA
+  zip: 90210
 pets:
 - name: Doggie
   type: cat

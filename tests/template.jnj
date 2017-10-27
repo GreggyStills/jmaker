@@ -4,10 +4,10 @@ Hello, {{ first_name }}!
 I have your information as follows:
 
 Full Name: {{ first_name }} {{ last_name }}
-Street address: {{ street_address }}
-City: {{ city }}
-State: {{ state }}   Zip: {{ zip }}
 Email: {{ email }}
+Address: {{ address.street }}
+City: {{ address.city }}
+State: {{ address.state }}   Zip: {{ address.zip }}
 
 Here's all your pets:
 {{ pets }}
