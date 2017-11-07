@@ -11,11 +11,6 @@ import yaml
 
 __author__ = "Greg Stilwell"
 
-# User's home directory
-HOME = os.path.expanduser('~')
-# Where to look for Jinja2 template files (default)
-TEMPLATE_DIR = os.path.join(HOME, 'templates')
-
 
 def eprint(msg, newline="\n"):
     """Print to stderr, so redirects (>) only capture program output,
@@ -86,7 +81,7 @@ def parse_args(cli_args):
         help='Name of data file (YAML/JSON) to load for filling in variables in template.')
     parser.add_argument(
         '--altdir', dest='altdir', type=str,
-        help='Alternate directory to search for Jinja2 templates. (default: {})'.format(TEMPLATE_DIR))
+        help='Alternate directory to search for Jinja2 templates.')
     parser.add_argument(
         '--lt', dest='listtemplates', action="store_true",
         help='List templates found in template dir.')
