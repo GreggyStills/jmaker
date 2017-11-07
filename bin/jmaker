@@ -80,7 +80,7 @@ def parse_args(cli_args):
     parser = argparse.ArgumentParser(description='Jinja2 template renderer.')
     parser.add_argument(
         'template', nargs="?", type=str,
-        help='Name of Jinja2 template filename in template directory.')
+        help='Name of Jinja2 template filename.')
     parser.add_argument(
         'datafile', nargs="?", type=str,
         help='Name of data file (YAML/JSON) to load for filling in variables in template.')
@@ -93,6 +93,9 @@ def parse_args(cli_args):
     parser.add_argument(
         '--of', dest='outfile', type=str,
         help='Filename to save rendered output.')
+    parser.add_argument(
+        '--append', dest='append', default=False, action="store_true",
+        help='Append to output file; default is to overwrite.')
     parsed_args = parser.parse_args(cli_args)
     return parsed_args
 
@@ -120,17 +123,28 @@ def write_file(fname, fdata, append=False):
 
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
+    template_filepath = args.template
+    # allow user to explicitly specify a different template dir to search for templates
     if args.altdir:
         TEMPLATE_DIR = args.altdir
+        template_filename = template_filepath
+    else:
+        # auto-determine template dir from specified template path/file
+        TEMPLATE_DIR, template_filename = os.path.split(os.path.abspath(template_filepath))
+
     renderer = Jrenderer(template_dir=TEMPLATE_DIR)
     if args.listtemplates:
         renderer.list_templates()
         exit()
 
-    template_filename = args.template
     fill_data = load_yaml(args.datafile)
     rendered_text = renderer.render(template_filename, fill_data)
+
     if args.outfile:
-        write_file(args.outfile, rendered_text, append=False)
+        outdir = os.path.split(os.path.abspath(args.outfile))[0]
+        # Create output directory if doesn't exist yet
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+        write_file(args.outfile, rendered_text, append=args.append)
     else:
         print(rendered_text)
