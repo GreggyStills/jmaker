@@ -85,8 +85,35 @@ def parse_args(cli_args):
     parser.add_argument(
         '--lt', dest='listtemplates', action="store_true",
         help='List templates found in template dir.')
+    parser.add_argument(
+        '--of', dest='outfile', type=str,
+        help='Filename to save rendered output.')
     parsed_args = parser.parse_args(cli_args)
     return parsed_args
+
+
+def write_file(fname, fdata, append=False):
+    """Write data to file.
+
+    Args:
+        fname (str): filename
+        fdata (str): crap to write to file
+        append (bool): True=append to file, False=overwrite file
+    """
+    assert isinstance(fdata, (str, unicode))
+    if append:
+        write_mode = "a"
+    else:
+        write_mode = "w"
+    with open(fname, write_mode) as f:
+        try:
+            f.write(fdata)
+        except UnicodeEncodeError:
+            f.write(fdata.encode('utf8'))
+    if append:
+        eprint("Appended to file: {}".format(fname))
+    else:
+        eprint("Wrote to file: {}".format(fname))
 
 
 if __name__ == "__main__":
@@ -100,4 +127,8 @@ if __name__ == "__main__":
 
     template_filename = args.template
     fill_data = load_yaml(args.datafile)
-    print(renderer.render(template_filename, fill_data))
+    rendered = renderer.render(template_filename, fill_data)
+    if args.outfile:
+        write_file(args.outfile, rendered, append=False)
+    else:
+        print(rendered)
