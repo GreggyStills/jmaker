@@ -56,6 +56,11 @@ class Jrenderer:
         """
         template = self.env.get_template(template_name)
         rendered = template.render(variable_data)
+        # check for weird unicode char's, set encoding to handle it
+        try:
+            str(rendered)
+        except UnicodeEncodeError:
+            rendered = rendered.encode(encoding='utf8')
         return rendered
 
 
@@ -106,10 +111,7 @@ def write_file(fname, fdata, append=False):
     else:
         write_mode = "w"
     with open(fname, write_mode) as f:
-        try:
-            f.write(fdata)
-        except UnicodeEncodeError:
-            f.write(fdata.encode('utf8'))
+        f.write(fdata)
     if append:
         eprint("Appended to file: {}".format(fname))
     else:
@@ -127,8 +129,8 @@ if __name__ == "__main__":
 
     template_filename = args.template
     fill_data = load_yaml(args.datafile)
-    rendered = renderer.render(template_filename, fill_data)
+    rendered_text = renderer.render(template_filename, fill_data)
     if args.outfile:
-        write_file(args.outfile, rendered, append=False)
+        write_file(args.outfile, rendered_text, append=False)
     else:
-        print(rendered)
+        print(rendered_text)

@@ -21,3 +21,6 @@ Oh yeah, and don't forget to pickup groceries:
 {% for item in grocery_list %}
 {{ loop.index }}. {{ item }}
 {%  endfor %}
+
+# some weird unicode char
+‹
