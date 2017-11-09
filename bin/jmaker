@@ -4,6 +4,7 @@ A script to render text from Jinja2 templates + input data.
 """
 import argparse
 import os
+import random
 import sys
 
 import jinja2
@@ -36,6 +37,9 @@ class Jrenderer:
         self.env.trim_blocks = True
         # lstrip_blocks: If True, leading spaces and tabs are stripped from the start of a line to a block
         self.env.lstrip_blocks = True
+        # add function to use within templates
+        self.env.globals.update({
+            "EXrndstring": rnd_string})
 
     def list_templates(self):
         eprint("Template search path:\n\t{}".format(self.env.loader.searchpath))
@@ -60,6 +64,21 @@ class Jrenderer:
         except UnicodeEncodeError:
             rendered = rendered.encode(encoding='utf8')
         return rendered
+
+
+def rnd_string(length=32):
+    """Generate a random string.
+
+    Args:
+        length (int): length of string to generate
+    """
+    lowercase = "abcdefghijklmnopqrstuvwxyz"
+    uppercase = lowercase.upper()
+    numbers = "0123456789"
+    symbols = "!@#$%^*+="
+    charset = [char for char in lowercase + uppercase + numbers + symbols]
+    randchars = [random.choice(charset) for _ in xrange(length)]
+    return "".join(randchars)
 
 
 def load_yaml(yaml_file):
