@@ -27,9 +27,8 @@ class Jrenderer:
         Args:
             template_dir (str): path to Jinja2 templates
         """
-        tdirs = [template_dir]
-        for directory in tdirs:
-            assert os.path.isdir(directory), "Template directory not found: {}".format(directory)
+        home_templates = os.path.join(os.path.expanduser("~"), "templates")
+        tdirs = [template_dir, home_templates]
         self.env = jinja2.Environment()
         # load templates into environment
         self.env.loader = jinja2.FileSystemLoader(tdirs)
@@ -39,7 +38,7 @@ class Jrenderer:
         self.env.lstrip_blocks = True
 
     def list_templates(self):
-        eprint("Template directory:\n\t{}".format(self.env.loader.searchpath))
+        eprint("Template search path:\n\t{}".format(self.env.loader.searchpath))
         eprint("Templates found:\n\t{}\n\n".format("\n\t".join(self.env.list_templates())))
 
     def render(self, template_name, variable_data):
@@ -49,7 +48,11 @@ class Jrenderer:
             template_name (str): filename of Jinja2 template file to render
             variable_data (dict): data to pass to Jinja2 for filling in template variables
         """
-        template = self.env.get_template(template_name)
+        try:
+            template = self.env.get_template(template_name)
+        except jinja2.exceptions.TemplateNotFound:
+            self.list_templates()
+            raise
         rendered = template.render(variable_data)
         # check for weird unicode char's, set encoding to handle it
         try:
