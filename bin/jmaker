@@ -5,7 +5,9 @@ A script to render text from Jinja2 templates + input data.
 import argparse
 import os
 import random
+import shutil
 import sys
+import time
 
 import jinja2
 import yaml
@@ -113,19 +115,26 @@ def parse_args(cli_args):
     parser.add_argument(
         '--append', dest='append', default=False, action="store_true",
         help='Append to output file; default is to overwrite.')
+    parser.add_argument(
+        '--safe', dest='safe', default=False, action="store_true",
+        help='If output file exists, copy it to a backup first.')
+
     parsed_args = parser.parse_args(cli_args)
     return parsed_args
 
 
-def write_file(fname, fdata, append=False):
+def write_file(fname, fdata, append=False, safe=False):
     """Write data to file.
 
     Args:
         fname (str): filename
         fdata (str): crap to write to file
         append (bool): True=append to file, False=overwrite file
+        safe (bool): True=if file already exists, move it to a backup
     """
     assert isinstance(fdata, (str, unicode))
+    if safe:
+        backup_file(fname)
     if append:
         write_mode = "a"
     else:
@@ -136,6 +145,14 @@ def write_file(fname, fdata, append=False):
         eprint("Appended to file: {}".format(fname))
     else:
         eprint("Wrote to file: {}".format(fname))
+
+
+def backup_file(fname):
+    """If file exists, copy it to a backup filename (timestamped)."""
+    if os.path.exists(fname):
+        backup_fname = "{}.{}".format(fname, time.strftime("%Y%m%d-%H%M%S"))
+        shutil.copy(fname, backup_fname)
+        eprint("Existing file backed up to: {}".format(backup_fname))
 
 
 if __name__ == "__main__":
@@ -162,6 +179,6 @@ if __name__ == "__main__":
         # Create output directory if doesn't exist yet
         if not os.path.exists(outdir):
             os.makedirs(outdir)
-        write_file(args.outfile, rendered_text, append=args.append)
+        write_file(args.outfile, rendered_text, append=args.append, safe=args.safe)
     else:
         print(rendered_text)
