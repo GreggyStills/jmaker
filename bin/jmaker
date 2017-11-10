@@ -76,7 +76,7 @@ def rnd_string(length=32):
     uppercase = lowercase.upper()
     numbers = "0123456789"
     symbols = "!@#$%^*+="
-    charset = [char for char in lowercase + uppercase + numbers + symbols]
+    charset = lowercase + uppercase + numbers + symbols
     randchars = [random.choice(charset) for _ in xrange(length)]
     return "".join(randchars)
 
