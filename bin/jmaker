@@ -39,7 +39,7 @@ class Jrenderer:
         self.env.lstrip_blocks = True
         # add function to use within templates
         self.env.globals.update({
-            "EXrndstring": rnd_string})
+            "EXrndstring": make_rndstring})
 
     def list_templates(self):
         eprint("Template search path:\n\t{}".format(self.env.loader.searchpath))
@@ -66,7 +66,7 @@ class Jrenderer:
         return rendered
 
 
-def rnd_string(length=32):
+def make_rndstring(length=32):
     """Generate a random string.
 
     Args:
