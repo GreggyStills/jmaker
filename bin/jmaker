@@ -104,7 +104,7 @@ def parse_args(cli_args):
         'datafile', nargs="?", type=str,
         help='Name of data file (YAML/JSON) to load for filling in variables in template.')
     parser.add_argument(
-        '--altdir', dest='altdir', type=str,
+        '--altdir', type=str,
         help='Alternate directory to search for Jinja2 templates.')
     parser.add_argument(
         '--lt', dest='listtemplates', action="store_true",
@@ -113,10 +113,10 @@ def parse_args(cli_args):
         '--of', dest='outfile', type=str,
         help='Filename to save rendered output.')
     parser.add_argument(
-        '--append', dest='append', default=False, action="store_true",
+        '--append', default=False, action="store_true",
         help='Append to output file; default is to overwrite.')
     parser.add_argument(
-        '--safe', dest='safe', default=False, action="store_true",
+        '--safe', default=False, action="store_true",
         help='If output file exists, copy it to a backup first.')
 
     parsed_args = parser.parse_args(cli_args)
@@ -130,7 +130,7 @@ def write_file(fname, fdata, append=False, safe=False):
         fname (str): filename
         fdata (str): crap to write to file
         append (bool): True=append to file, False=overwrite file
-        safe (bool): True=if file already exists, move it to a backup
+        safe (bool): True=if file already exists, copy it to a backup first
     """
     assert isinstance(fdata, (str, unicode))
     if safe:
