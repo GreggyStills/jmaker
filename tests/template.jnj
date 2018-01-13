@@ -28,3 +28,6 @@ Oh yeah, and don't forget to pickup groceries:
 # Random strings
 32 char random string:  '{{ EXrndstring(32) }}'
 64 char random string:  '{{ EXrndstring(64) }}'
+
+# Lorem ipsum
+{{ lipsum(n=3, html=False, min=10, max=30) }}
